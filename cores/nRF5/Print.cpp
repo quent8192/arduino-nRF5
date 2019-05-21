@@ -18,6 +18,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <string.h>
 #include <math.h>
 #include "Arduino.h"
@@ -206,6 +207,24 @@ size_t Print::printNumber(unsigned long n, uint8_t base)
   } while(n);
 
   return write(str);
+}
+
+int Print::printf(const char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	char buffer[1024];      // this buffer is awful. We should use vdprintf or something like that instead
+	vsnprintf(buffer, sizeof(buffer), format, ap);
+	return write(buffer);
+}
+
+int Print::printf(const __FlashStringHelper *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	char buffer[1024];      // this buffer is awful. We should use vdprintf or something like that instead
+	vsnprintf(buffer, sizeof(buffer), (const char*)format, ap);
+	return write(buffer);
 }
 
 size_t Print::printFloat(double number, uint8_t digits)
